@@ -4,13 +4,16 @@ package com.security.springsecurity_6.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,9 +35,21 @@ public class SecurityConfig {
     @Autowired
     AuthenticationConfiguration authenticationConfiguration;
 
+
+    //7 debemos configurar el filtro de seguridad, porque de momento este sigue de largo y no nos autentica los usuarios establecidos
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.build();
+        return httpSecurity
+                .csrf(csrf -> csrf.disable())
+                //esto lo agregamos cuando se inicia session sin tokens
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(http -> {
+                    http.requestMatchers(HttpMethod.GET, "/auth/hello").permitAll();
+                    http.requestMatchers(HttpMethod.GET, "/auth/hello-secured").hasAnyAuthority("READ");
+                    http.anyRequest().denyAll();
+                })
+                .build();
     }
 
 
@@ -50,8 +65,8 @@ public class SecurityConfig {
         //4 este es el proveedor que nos permitira conectarnos con una base de datos y traer los usuarios con sus respectivas credenciales, a su vez este proveedor necesita el passwordencoder que es el componente que encripta las claves y las valida y el userDetailService, que practicamente es el componente que hace el llamado a la base de datos, de momento seran null los espacios el password y el userDetailsService. Se ha configurado el provider con sus dos componentes, el passwordEncoder y el userDetailsService
 
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setPasswordEncoder(null);
-        daoAuthenticationProvider.setUserDetailsService(null);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
         return daoAuthenticationProvider;
     }
 
