@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,6 +34,16 @@ public class SecurityConfig {
 
         //3 con esto estamos configurando el componente encargado de la autenticacion
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() throws Exception {
+        //4 este es el proveedor que nos permitira conectarnos con una base de datos y traer los usuarios con sus respectivas credenciales, a su vez este proveedor necesita el passwordencoder que es el componente que encripta las claves y las valida y el userDetailService, que practicamente es el componente que hace el llamado a la base de datos, de momento seran null los espacios el password y el userDetailsService
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setPasswordEncoder(null);
+        daoAuthenticationProvider.setUserDetailsService(null);
+        return daoAuthenticationProvider;
+
     }
 
 }
