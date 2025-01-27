@@ -19,7 +19,6 @@ public class AuthController {
     }
 
 
-
     @GetMapping("/hello-secured")
     @PreAuthorize("hasAnyAuthority('CREATE')")
     public String helloSecured() {
