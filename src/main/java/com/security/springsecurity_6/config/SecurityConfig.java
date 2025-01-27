@@ -37,6 +37,25 @@ public class SecurityConfig {
 
 
     //7 debemos configurar el filtro de seguridad, porque de momento este sigue de largo y no nos autentica los usuarios establecidos
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+//        return httpSecurity
+//                .csrf(csrf -> csrf.disable())
+//                //esto lo agregamos cuando se inicia session sin tokens
+//                .httpBasic(Customizer.withDefaults())
+//                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(http -> {
+//                    //se configuran los endpoints publicos
+//                    http.requestMatchers(HttpMethod.GET, "/auth/hello").permitAll();
+//                    //se configuran los endpoints privados
+//                    http.requestMatchers(HttpMethod.GET, "/auth/hello-secured").hasAnyAuthority("CREATE");
+//                    //se configuran el resto de endpoints no especificados
+//                    http.anyRequest().denyAll();
+//                })
+//                .build();
+//    }
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -44,14 +63,7 @@ public class SecurityConfig {
                 //esto lo agregamos cuando se inicia session sin tokens
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(http -> {
-                    //se configuran los endpoints publicos
-                    http.requestMatchers(HttpMethod.GET, "/auth/hello").permitAll();
-                    //se configuran los endpoints privados
-                    http.requestMatchers(HttpMethod.GET, "/auth/hello-secured").hasAnyAuthority("CREATE");
-                    //se configuran el resto de endpoints no especificados
-                    http.anyRequest().denyAll();
-                })
+
                 .build();
     }
 
